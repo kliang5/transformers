@@ -7,6 +7,9 @@ name: Self-hosted runner (scheduled)
 # `docker/transformers-pytorch-deepspeed-latest-gpu/Dockerfile`
 
 on:
+  push:
+    branches:
+      - post-action-build-test-tokenizers-*
   repository_dispatch:
   schedule:
     - cron: "0 2 * * *"
@@ -29,8 +32,11 @@ jobs:
         machine_type: [single-gpu, multi-gpu]
     runs-on: ${{ format('{0}-{1}', matrix.machine_type, 'docker') }}
     container:
-      image: huggingface/transformers-all-latest-gpu
+      image: huggingface/internal-transformers-all-latest-gpu-tokenizers-main
       options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -65,8 +71,11 @@ jobs:
         machine_type: [single-gpu]
     runs-on: ${{ format('{0}-{1}', matrix.machine_type, 'docker') }}
     container:
-      image: huggingface/transformers-all-latest-gpu
+      image: huggingface/internal-transformers-all-latest-gpu-tokenizers-main
       options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
     needs: setup
     steps:
       - name: Echo folder ${{ matrix.folders }}
@@ -166,8 +175,11 @@ jobs:
     name: Examples directory
     runs-on: [self-hosted, single-gpu-docker]
     container:
-      image: huggingface/transformers-all-latest-gpu
+      image: huggingface/internal-transformers-all-latest-gpu-tokenizers-main
       options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
     needs: setup
     steps:
       - name: Update clone
@@ -209,8 +221,11 @@ jobs:
         machine_type: [single-gpu, multi-gpu]
     runs-on: ${{ format('{0}-{1}', matrix.machine_type, 'docker') }}
     container:
-      image: huggingface/transformers-pytorch-gpu
-      options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      image: huggingface/internal-transformers-pytorch-gpu-tokenizers-main
+      options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
     needs: setup
     steps:
       - name: Update clone
@@ -253,8 +268,11 @@ jobs:
         machine_type: [single-gpu, multi-gpu]
     runs-on: ${{ format('{0}-{1}', matrix.machine_type, 'docker') }}
     container:
-      image: huggingface/transformers-tensorflow-gpu
-      options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      image: huggingface/internal-transformers-tensorflow-gpu-tokenizers-main
+      options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
     needs: setup
     steps:
       - name: Update clone
@@ -299,8 +317,11 @@ jobs:
     runs-on: ${{ format('{0}-{1}', matrix.machine_type, 'docker') }}
     needs: setup
     container:
-      image: huggingface/transformers-pytorch-deepspeed-latest-gpu
+      image: huggingface/internal-transformers-pytorch-deepspeed-latest-gpu-tokenizers-main
       options: --gpus all --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - name: Update clone
         working-directory: /workspace/transformers
@@ -351,7 +372,7 @@ jobs:
         env:
           CI_SLACK_BOT_TOKEN: ${{ secrets.CI_SLACK_BOT_TOKEN }}
           CI_SLACK_CHANNEL_ID: ${{ secrets.CI_SLACK_CHANNEL_ID }}
-          CI_SLACK_CHANNEL_ID_DAILY: ${{ secrets.CI_SLACK_CHANNEL_ID_DAILY }}
+          CI_SLACK_CHANNEL_ID_DAILY: ${{ secrets.CI_SLACK_CHANNEL_DUMMY_TESTS }}
           CI_SLACK_CHANNEL_DUMMY_TESTS: ${{ secrets.CI_SLACK_CHANNEL_DUMMY_TESTS }}
           CI_SLACK_REPORT_CHANNEL_ID: ${{ secrets.CI_SLACK_CHANNEL_ID_DAILY }}
           CI_EVENT: scheduled
