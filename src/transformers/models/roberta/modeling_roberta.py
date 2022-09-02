@@ -22,6 +22,7 @@ import torch
 import torch.utils.checkpoint
 from torch import nn
 from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, MSELoss
+import wandb
 
 from ...activations import ACT2FN, gelu
 from ...modeling_outputs import (
